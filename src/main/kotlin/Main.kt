@@ -1,7 +1,4 @@
-import com.proxmox.api.addCloudInit
-import com.proxmox.api.attachDisk
-import com.proxmox.api.createVm
-import com.proxmox.api.resizeDisk
+import com.proxmox.api.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import java.net.URLEncoder
@@ -34,12 +31,14 @@ fun main() = runBlocking {
         2 to "24.04 LTS"
     )
 
+
     val debianImageVersion = mapOf(
         0 to "Bookworm 12",
         1 to "Bullseye 11",
         2 to "Buster 10",
     )
 
+    // Mention all the files for the versions, also match it the debianImageVersion above
     val debianImageFile = mapOf(
         0 to "debian-cloud.qcow2",
         1 to "debian-11-genericcloud-amd64.qcow2",
@@ -222,9 +221,24 @@ fun main() = runBlocking {
         )
     }
 
+    suspend fun consoleAndBootOrderFunc() {
+        val result = addSerialConsoleAndSetBootOrder(
+            serial0 = "socket",
+            vga = "serial0",
+            boot = "order=scsi0",
+            node,
+            vmid
+        )
+    }
+
     // Invoke all the methods that are created
     createVmFunc()
+    Thread.sleep(2000)
     attachDiskFunc()
+    Thread.sleep(2000)
     resizeDiskFunc()
+    Thread.sleep(2000)
     cloudInitFunc()
+    Thread.sleep(2000)
+    consoleAndBootOrderFunc()
 }

@@ -176,3 +176,35 @@ suspend fun addCloudInit(cdrom: String, ciupgrade: Boolean, ciuser: String, sshk
         client.close()
     }
 }
+
+suspend fun addSerialConsoleAndSetBootOrder(serial0: String, vga: String, boot:String, node: String, vmid: Int): Result<HttpResponse> {
+    val client: HttpClient = createKtorClient()
+
+    @Serializable
+    data class consoleAndBootOrderParams(
+        val serial0: String,
+        val vga: String,
+        val boot: String
+    )
+
+    val consoleAndBootOrderData = consoleAndBootOrderParams(
+        serial0,
+        vga,
+        boot
+    )
+
+    try {
+        val response: HttpResponse = client.put("${proxmoxApi}/nodes/${node}/qemu/${vmid}/config") {
+            header("Authorization", authHeader)
+            contentType(ContentType.Application.Json)
+            setBody(consoleAndBootOrderData)
+        }
+        return Result.success(response)
+    } catch (e: Exception) {
+        return Result.failure(e)
+    } finally {
+        client.close()
+    }
+
+
+}
