@@ -9,9 +9,46 @@ fun main() = runBlocking {
 
     // Start of the CLI
 
+    data class imageVersion(
+        val id: Int,
+        val version: String,
+        val file: String
+    )
+
+    val multiValueMap: Map<String, List<imageVersion>> = mapOf(
+        "archImageVersionMap" to listOf(
+            imageVersion(0,"v20241215.289320", "Arch-Linux-x86_64-cloudimg-20241215.289320.qcow2"),
+            imageVersion(1, "v20241201.284788", "Arch-Linux-x86_64-cloudimg-20241201.284788.qcow2"),
+            imageVersion(2, "v20241115.279641", "Arch-Linux-x86_64-cloudimg-20241115.279641.qcow2")
+        ),
+        "ubuntuImageVersionMap" to listOf(
+            imageVersion(0,"24.04 LTS", "noble-server-cloudimg-amd64.qcow2"),
+            imageVersion(1,"22.04 LTS", "jammy-server-cloudimg-amd64.qcow2"),
+            imageVersion(2,"20.04 LTS", "focal-server-cloudimg-amd64.qcow2")
+        ),
+        "fedoraImageVersionMap" to listOf(
+            imageVersion(0, "41", "Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"),
+            imageVersion(1, "40", "Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2"),
+            imageVersion(2, "39", "Fedora-Cloud-Base-39-1.5.x86_64.qcow2")
+        ),
+        "debianImageVersionMap" to listOf(
+            imageVersion(0,"Bookworm 12", "debian-cloud.qcow2"),
+            imageVersion(1,"Bullseye 11", "debian-11-genericcloud-amd64.qcow2"),
+            imageVersion(2,"Buster 10", "debian-10-genericcloud-amd64.qcow2")
+        ),
+        "almaImageVersionMap" to listOf(
+            imageVersion(0, "AlmaLinux 9.5", "AlmaLinux-9-GenericCloud-9.5-20241120.x86_64.qcow2"),
+            imageVersion(1, "AlmaLinux 8", "AlmaLinux-8-GenericCloud-8.10-20240819.x86_64.qcow2")
+        ),
+        "rockyImageVersionMap" to listOf(
+            imageVersion(0, "Rocky Linux 9.5", "Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.qcow2"),
+            imageVersion(1, "Rocky Linux 8.9", "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2")
+        )
+    )
+
     val node = "pve" // Have to change this in future
-    val localPath: String = "local"
-    val localLvmPath: String = "local-lvm"
+    val localPath = "local"
+    val localLvmPath = "local-lvm"
     val cdrom = "${localPath}:cloudinit"
     val ciuser = "eren"
 
@@ -25,36 +62,14 @@ fun main() = runBlocking {
         5 to "RockyLinux"
     )
 
-    val ubuntuImageVersion = mapOf(
-        0 to "24.10",
-        1 to "24.04 LTS",
-        2 to "24.04 LTS"
-    )
-
-
-    val debianImageVersion = mapOf(
-        0 to "Bookworm 12",
-        1 to "Bullseye 11",
-        2 to "Buster 10",
-    )
-
     // Mention all the files for the versions, also match it the debianImageVersion above
-    val debianImageFile = mapOf(
-        0 to "debian-cloud.qcow2",
-        1 to "debian-11-genericcloud-amd64.qcow2",
-        2 to "debian-10-genericcloud-amd64.qcow2"
-    )
-
-    val fedoraImageVersion = mapOf(
-        0 to "41",
-        1 to "40",
-        2 to "39",
-    )
-
     val imageMap = mapOf(
-        1 to ubuntuImageVersion,
-        3 to debianImageVersion,
-        2 to fedoraImageVersion
+        0 to multiValueMap["archImageVersionMap"],
+        1 to multiValueMap["ubuntuImageVersionMap"],
+        2 to multiValueMap["fedoraImageVersionMap"],
+        3 to multiValueMap["debianImageVersionMap"],
+        4 to multiValueMap["almaImageVersionMap"],
+        5 to multiValueMap["rockyImageVersionMap"]
     )
 
     val size1 = mapOf(
@@ -87,18 +102,20 @@ fun main() = runBlocking {
 
     println("The versions are : ")
 
-    val selectedImage: Map<Int, String> = imageMap[imageInput] ?: emptyMap()
+    val selectedImage: List<imageVersion>  = imageMap[imageInput]!!
     // println(selectedImage)
 
     println("Choose the version : ")
-    selectedImage.forEach{ entry ->
-        print("${entry.key} : ${entry.value}")
+    selectedImage.forEach{ image ->
+        print("${image.id} : ${image.version}")
         println()
     }
     print("Enter the corresponding number : ")
 
     val selectedImageInput = readln().toInt()
-    val selectedImageVersion: String = debianImageFile[selectedImageInput]!!
+
+
+    val selectedImageVersion: String = selectedImage[selectedImageInput].file
 
     // println("Selected version is $selectedImageVersion")
 
@@ -136,7 +153,7 @@ fun main() = runBlocking {
     val vmid: Int = readln().toInt()
 
     println()
-    print("Enter the IP Address for the VM - Example -> 10.2.0.20/24 : ")
+    print("Enter the IP Address for the VM - Example -> 10.2.0.20 : ")
     val ipAddress: String = readln()
 
     println()
@@ -206,7 +223,7 @@ fun main() = runBlocking {
             ciuser = ciuser,
             ciupgrade = false,
             sshkeys = sshKey,
-            ipconfig0 = "ip=${ipAddress},gw=${gateway}",
+            ipconfig0 = "ip=${ipAddress}/24,gw=${gateway}",
             node = node,
             vmid = vmid
         )
@@ -229,6 +246,15 @@ fun main() = runBlocking {
             node,
             vmid
         )
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
+            }
+        )
     }
 
     // Invoke all the methods that are created
@@ -237,7 +263,7 @@ fun main() = runBlocking {
     attachDiskFunc()
     Thread.sleep(2000)
     resizeDiskFunc()
-    Thread.sleep(2000)
+    Thread.sleep(3000)
     cloudInitFunc()
     Thread.sleep(2000)
     consoleAndBootOrderFunc()
