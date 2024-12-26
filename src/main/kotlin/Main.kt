@@ -1,9 +1,12 @@
+import com.proxmox.api.addCloudInit
 import com.proxmox.api.attachDisk
 import com.proxmox.api.createVm
 import com.proxmox.api.resizeDisk
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
+import java.net.URLEncoder
 import kotlin.system.exitProcess
+import java.nio.charset.StandardCharsets
 
 fun main() = runBlocking {
 
@@ -12,6 +15,8 @@ fun main() = runBlocking {
     val node = "pve" // Have to change this in future
     val localPath: String = "local"
     val localLvmPath: String = "local-lvm"
+    val cdrom = "${localPath}:cloudinit"
+    val ciuser = "eren"
 
 
     val printImageMap = mapOf(
@@ -109,7 +114,7 @@ fun main() = runBlocking {
         print("${size.key} : ${size.value}   ")
     }
     println()
-    print("Enter the corresponding number")
+    print("Enter the corresponding number : ")
     val inputSize: Int = readln().toInt()
     val selectedSize = printSize[inputSize] ?: emptyMap()
 
@@ -118,8 +123,8 @@ fun main() = runBlocking {
     val storage = selectedSize["Storage"].toString()
     println()
 
-//    print("Enter the SSH Key : ")
-//    val sshKey: String = readln()
+    print("Enter the SSH Key : ")
+    val sshKey: String = URLEncoder.encode(readln(), StandardCharsets.UTF_8.toString()).replace("+", "%20")
 
     println()
 
@@ -132,26 +137,12 @@ fun main() = runBlocking {
     val vmid: Int = readln().toInt()
 
     println()
-//    print("Enter the IP Address for the VM : Example -> 10.2.0.20/24")
-//    val ipAddress: String = readln()
+    print("Enter the IP Address for the VM - Example -> 10.2.0.20/24 : ")
+    val ipAddress: String = readln()
 
-//    println()
-//    print("Enter the gateway : ")
-//    val gateway: String = readln()
-
-
-//    val response = suspend {
-//        createVm(
-//            vmid,
-//            node = "pve",
-//            cores,
-//            name,
-//            memory,
-//            net0 = "virtio,bridge=vmbr0"
-//        )
-//    }
-//
-//    println(response)
+    println()
+    print("Enter the gateway : ")
+    val gateway: String = readln()
 
     suspend fun createVmFunc() {
         val result = createVm(
@@ -210,8 +201,30 @@ fun main() = runBlocking {
         )
     }
 
+    suspend fun cloudInitFunc() {
+        val result = addCloudInit(
+            cdrom,
+            ciuser = ciuser,
+            ciupgrade = false,
+            sshkeys = sshKey,
+            ipconfig0 = "ip=${ipAddress},gw=${gateway}",
+            node = node,
+            vmid = vmid
+        )
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
+            }
+        )
+    }
+
     // Invoke all the methods that are created
     createVmFunc()
     attachDiskFunc()
     resizeDiskFunc()
+    cloudInitFunc()
 }

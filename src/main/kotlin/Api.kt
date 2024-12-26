@@ -142,3 +142,37 @@ suspend fun resizeDisk(disk: String, size: String, node: String, vmid: Int): Res
     }
 
 }
+
+
+suspend fun addCloudInit(cdrom: String, ciupgrade: Boolean, ciuser: String, sshkeys: String, ipconfig0: String, node: String, vmid: Int): Result<HttpResponse> {
+    val client: HttpClient = createKtorClient()
+
+    @Serializable
+    data class addCloudInitParams(
+        val cdrom: String,
+        val ciupgrade: Boolean,
+        val ciuser: String,
+        val sshkeys: String,
+        val ipconfig0: String,
+    )
+
+    val addCloudInitData = addCloudInitParams(
+        cdrom,
+        ciupgrade,
+        ciuser,
+        sshkeys,
+        ipconfig0
+    )
+    try {
+        val response: HttpResponse = client.put("${proxmoxApi}/nodes/${node}/qemu/${vmid}/config") {
+            header("Authorization", authHeader)
+            contentType(ContentType.Application.Json)
+            setBody(addCloudInitData)
+        }
+        return Result.success(response)
+    } catch (e: Exception) {
+        return Result.failure(e)
+    } finally {
+        client.close()
+    }
+}
