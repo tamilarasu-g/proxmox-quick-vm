@@ -1,109 +1,126 @@
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
+import com.proxmox.api.createVm
 import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.json.*
-import io.ktor.serialization.kotlinx.json.*
-import javax.net.ssl.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.Serializable
-import org.dotenv.vault.dotenvVault
+import kotlinx.coroutines.runBlocking
 
-val dotenv = dotenvVault()
-val auth_header = dotenv["API_TOKEN"]
-val proxmox_api = dotenv["API_HOST"]
+fun main() = runBlocking {
+
+// Start of the CLI
+
+    val printImageMap = mapOf(0 to "Arch", 1 to "Ubuntu", 2 to "Fedora", 3 to "Debian", 4 to "AlmaLinux", 5 to "RockyLinux")
+
+    val ubuntuImageVersion = mapOf(0 to "24.10", 1 to "24.04 LTS", 2 to "22.10", 3 to "24.04 LTS")
+    val debianImageVersion = mapOf(0 to "Bookworm 12", 1 to "Bullseye 11", 2 to "Buster 10", 3 to "Stretch 9")
+    val fedoraImageVersion = mapOf(0 to "41", 1 to "40", 2 to "39", 3 to "38")
+
+    val imageMap = mapOf(1 to ubuntuImageVersion, 3 to debianImageVersion, 2 to fedoraImageVersion)
+
+    val size1 = mapOf("CPU" to 2, "Storage" to "50G", "Memory" to "2048")
+
+    val size2 = mapOf("CPU" to 1, "Storage" to "25G", "Memory" to "1024")
+
+    val printSize = mapOf(0 to size1, 1 to size2)
+
+    println("Welcome to Quick-Proxmox-VM")
+
+    println("Choose an image")
+    printImageMap.forEach { entry ->
+        print("${entry.key} : ${entry.value}")
+        println()
+    }
+    print("Enter the corresponding number : ")
+    val imageInput: Int = readln().toInt()
+    // println("Entered value is $imageInput")
+
+    println("The versions are : ")
+
+    val selectedImage: Map<Int, String> = imageMap[imageInput] ?: emptyMap()
+    // println(selectedImage)
+
+    println("Choose the version : ")
+    selectedImage.forEach{ entry ->
+        print("${entry.key} : ${entry.value}")
+        println()
+    }
+    print("Enter the corresponding number : ")
+
+    val selectedImageVersion = readln()
+    // println("Selected version is $selectedImageVersion")
+
+    println("Choose the size of the vm")
+    print("0 -> ")
+    size1.forEach{ size ->
+        print("${size.key} : ${size.value}   ")
+    }
+    println()
+    print("1 -> ")
+    size2.forEach{ size ->
+        print("${size.key} : ${size.value}   ")
+    }
+    println()
+    print("Enter the corresponding number")
+    val inputSize: Int = readln().toInt()
+    val selectedSize = printSize[inputSize] ?: emptyMap()
+
+    val cores = selectedSize["CPU"].toString().toInt()
+    val memory = selectedSize["Memory"].toString()
+    println()
+
+//    print("Enter the SSH Key : ")
+//    val sshKey: String = readln()
+
+    println()
+
+    print("Enter the Name for the VM : ")
+    val name: String = readln()
+
+    println()
+
+    print("Enter the VMID : ")
+    val vmid: Int = readln().toInt()
+
+    println()
+//    print("Enter the IP Address for the VM : Example -> 10.2.0.20/24")
+//    val ipAddress: String = readln()
+
+//    println()
+//    print("Enter the gateway : ")
+//    val gateway: String = readln()
 
 
-suspend fun main() {
-    // Create a TrustManager that disables SSL verification
-    val trustAllCerts = arrayOf<TrustManager>(
-        object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>?, authType: String?) {}
-            override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>?, authType: String?) {}
-            override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> = arrayOf()
-        }
-    )
+//    val response = suspend {
+//        createVm(
+//            vmid,
+//            node = "pve",
+//            cores,
+//            name,
+//            memory,
+//            net0 = "virtio,bridge=vmbr0"
+//        )
+//    }
+//
+//    println(response)
 
-    // Create an SSLContext with the TrustManager
-    val sslContext = SSLContext.getInstance("TLS")
-    sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-
-    // Configure the Ktor HTTP client
-    val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json { prettyPrint = true; ignoreUnknownKeys = true; isLenient = true })
-        }
-        engine {
-            https {
-                sslContext
-                trustManager = trustAllCerts[0] as X509TrustManager
+    println("Before invoking")
+    suspend fun processData() {
+        println("The method is invoked")
+        val result = createVm(vmid,
+            node = "pve",
+            cores,
+            name,
+            memory,
+            net0 = "virtio,bridge=vmbr0")
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
             }
-        }
+        )
     }
 
-
-//    try {
-//        val response: HttpResponse = client.get("${proxmox_api}/nodes/pve/qemu") {
-//            header("Authorization", auth_header)
-//        }
-//        println(response.bodyAsText())
-//    } catch (e: Exception) {
-//        println("Error: ${e.message}")
-//    } finally {
-//        client.close()
-//    }
-
-//    @Serializable
-//    data class Mydata(val iface: String, val node: String, val type: String)
-//
-//    val new_data = Mydata(iface="anothernet", node = "pve", type = "bridge" )
-//    val jsonData = Json.encodeToString(new_data)
-//    println("Sending JSON: $jsonData")
-//
-//
-//    try {
-//        val response: HttpResponse = client.post("${proxmox_api}/nodes/pve/network") {
-//            header("Authorization", auth_header)
-//            contentType(ContentType.Application.Json)
-//            setBody(new_data)
-//        }
-//        println(response.status)
-//    } catch (e: Exception) {
-//        println("Error: ${e.message}")
-//    } finally {
-//        client.close()
-//    }
-
-
-    @Serializable
-    data class create_vm_params(
-        val vmid: Int,
-        val node: String,
-        val cores: Int,
-        val name: String,
-        val memory: String,
-        val net0: String
-    )
-
-    val new_data = create_vm_params(vmid = 110, node = "pve", cores = 2, name = "test2-vm", memory = "current=1024", net0 = "virtio,bridge=vmbr0")
-    val jsonData = Json.encodeToString(new_data)
-    println("Sending JSON: $jsonData")
-
-
-    try {
-        val response: HttpResponse = client.post("${proxmox_api}/nodes/pve/qemu") {
-            header("Authorization", auth_header)
-            contentType(ContentType.Application.Json)
-            setBody(new_data)
-        }
-        println(response.status)
-    } catch (e: Exception) {
-        println("Error: ${e.message}")
-    } finally {
-        client.close()
-    }
+processData()
 
 
 
