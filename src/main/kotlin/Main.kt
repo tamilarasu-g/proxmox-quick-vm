@@ -1,24 +1,74 @@
+import com.proxmox.api.attachDisk
 import com.proxmox.api.createVm
+import com.proxmox.api.resizeDisk
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
+import kotlin.system.exitProcess
 
 fun main() = runBlocking {
 
-// Start of the CLI
+    // Start of the CLI
 
-    val printImageMap = mapOf(0 to "Arch", 1 to "Ubuntu", 2 to "Fedora", 3 to "Debian", 4 to "AlmaLinux", 5 to "RockyLinux")
+    val node = "pve" // Have to change this in future
+    val localPath: String = "local"
+    val localLvmPath: String = "local-lvm"
 
-    val ubuntuImageVersion = mapOf(0 to "24.10", 1 to "24.04 LTS", 2 to "22.10", 3 to "24.04 LTS")
-    val debianImageVersion = mapOf(0 to "Bookworm 12", 1 to "Bullseye 11", 2 to "Buster 10", 3 to "Stretch 9")
-    val fedoraImageVersion = mapOf(0 to "41", 1 to "40", 2 to "39", 3 to "38")
 
-    val imageMap = mapOf(1 to ubuntuImageVersion, 3 to debianImageVersion, 2 to fedoraImageVersion)
+    val printImageMap = mapOf(
+        0 to "Arch",
+        1 to "Ubuntu",
+        2 to "Fedora",
+        3 to "Debian",
+        4 to "AlmaLinux",
+        5 to "RockyLinux"
+    )
 
-    val size1 = mapOf("CPU" to 2, "Storage" to "50G", "Memory" to "2048")
+    val ubuntuImageVersion = mapOf(
+        0 to "24.10",
+        1 to "24.04 LTS",
+        2 to "24.04 LTS"
+    )
 
-    val size2 = mapOf("CPU" to 1, "Storage" to "25G", "Memory" to "1024")
+    val debianImageVersion = mapOf(
+        0 to "Bookworm 12",
+        1 to "Bullseye 11",
+        2 to "Buster 10",
+    )
 
-    val printSize = mapOf(0 to size1, 1 to size2)
+    val debianImageFile = mapOf(
+        0 to "debian-cloud.qcow2",
+        1 to "debian-11-genericcloud-amd64.qcow2",
+        2 to "debian-10-genericcloud-amd64.qcow2"
+    )
+
+    val fedoraImageVersion = mapOf(
+        0 to "41",
+        1 to "40",
+        2 to "39",
+    )
+
+    val imageMap = mapOf(
+        1 to ubuntuImageVersion,
+        3 to debianImageVersion,
+        2 to fedoraImageVersion
+    )
+
+    val size1 = mapOf(
+        "CPU" to 2,
+        "Storage" to "50G",
+        "Memory" to "2048"
+    )
+
+    val size2 = mapOf(
+        "CPU" to 1,
+        "Storage" to "25G",
+        "Memory" to "1024"
+    )
+
+    val printSize = mapOf(
+        0 to size1,
+        1 to size2
+    )
 
     println("Welcome to Quick-Proxmox-VM")
 
@@ -43,7 +93,9 @@ fun main() = runBlocking {
     }
     print("Enter the corresponding number : ")
 
-    val selectedImageVersion = readln()
+    val selectedImageInput = readln().toInt()
+    val selectedImageVersion: String = debianImageFile[selectedImageInput]!!
+
     // println("Selected version is $selectedImageVersion")
 
     println("Choose the size of the vm")
@@ -63,6 +115,7 @@ fun main() = runBlocking {
 
     val cores = selectedSize["CPU"].toString().toInt()
     val memory = selectedSize["Memory"].toString()
+    val storage = selectedSize["Storage"].toString()
     println()
 
 //    print("Enter the SSH Key : ")
@@ -100,11 +153,10 @@ fun main() = runBlocking {
 //
 //    println(response)
 
-    println("Before invoking")
-    suspend fun processData() {
-        println("The method is invoked")
-        val result = createVm(vmid,
-            node = "pve",
+    suspend fun createVmFunc() {
+        val result = createVm(
+            vmid,
+            node,
             cores,
             name,
             memory,
@@ -116,12 +168,50 @@ fun main() = runBlocking {
             },
             onFailure = { exception ->
                 println("Error : ${exception.message}")
+                exitProcess(1)
             }
         )
     }
 
-processData()
+    suspend fun attachDiskFunc() {
+        val result = attachDisk(
+            vmid,
+            qcow2File = selectedImageVersion,
+            node,
+            localPath,
+            localLvmPath
+        )
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
+            }
+        )
+    }
 
+    suspend fun resizeDiskFunc() {
+        val result = resizeDisk(
+            disk = "scsi0",
+            size = storage,
+            node,
+            vmid,
+        )
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
+            }
+        )
+    }
 
-
+    // Invoke all the methods that are created
+    createVmFunc()
+    attachDiskFunc()
+    resizeDiskFunc()
 }

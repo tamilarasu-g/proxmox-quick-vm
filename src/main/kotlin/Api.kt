@@ -9,10 +9,8 @@ import io.ktor.http.*
 import kotlinx.serialization.json.*
 import io.ktor.serialization.kotlinx.json.*
 import javax.net.ssl.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.Serializable
 import org.dotenv.vault.dotenvVault
-import kotlin.reflect.typeOf
 
 // Initialize dotenv
 val dotenv = dotenvVault()
@@ -80,11 +78,9 @@ suspend fun createVm(vmid: Int, node: String, cores: Int, name: String, memory: 
     )
 
     val createVmData = createVmParams(vmid, node, cores, name, memory, net0)
-//    val jsonData = Json.encodeToString(createVmData)
-//    println("Sending JSON: $jsonData")
 
     try {
-        val response: HttpResponse = client.post("${proxmoxApi}/nodes/pve/qemu") {
+        val response: HttpResponse = client.post("${proxmoxApi}/nodes/${node}/qemu") {
             header("Authorization", authHeader)
             contentType(ContentType.Application.Json)
             setBody(createVmData)
@@ -95,4 +91,54 @@ suspend fun createVm(vmid: Int, node: String, cores: Int, name: String, memory: 
     } finally {
         client.close()
     }
+}
+
+suspend fun attachDisk(vmid: Int, qcow2File: String, node: String, localPath: String, localLvmPath: String ): Result<HttpResponse> {
+    val client: HttpClient = createKtorClient()
+
+    @Serializable
+    data class attachDiskParams(
+        val scsihw: String,
+        val scsi0: String,
+    )
+
+    val attachDiskData = attachDiskParams(scsihw = "virtio-scsi-pci", scsi0 = "${localLvmPath}:0,import-from=${localPath}:import/${qcow2File}")
+
+    try {
+        val response: HttpResponse = client.post("${proxmoxApi}/nodes/${node}/qemu/${vmid}/config") {
+            header("Authorization", authHeader)
+            contentType(ContentType.Application.Json)
+            setBody(attachDiskData)
+        }
+        return Result.success(response)
+    } catch (e: Exception) {
+        return Result.failure(e)
+    } finally {
+        client.close()
+    }
+}
+
+suspend fun resizeDisk(disk: String, size: String, node: String, vmid: Int): Result<HttpResponse> {
+    val client: HttpClient = createKtorClient()
+
+    @Serializable
+    data class resizeDiskParams(
+        val disk: String,
+        val size: String
+    )
+
+    val resizeDiskData = resizeDiskParams(disk, size)
+    try {
+        val response: HttpResponse = client.put("${proxmoxApi}/nodes/${node}/qemu/${vmid}/resize") {
+            header("Authorization", authHeader)
+            contentType(ContentType.Application.Json)
+            setBody(resizeDiskData)
+        }
+        return Result.success(response)
+    } catch (e: Exception) {
+        return Result.failure(e)
+    } finally {
+        client.close()
+    }
+
 }
