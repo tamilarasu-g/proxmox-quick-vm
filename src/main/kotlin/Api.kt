@@ -64,7 +64,7 @@ suspend fun getAllVm() {
 
 
 // Function to create a VM
-suspend fun createVm(vmid: Int, node: String, cores: Int, name: String, memory: String, net0: String): Result<HttpResponse> {
+suspend fun createVm(vmid: Int, node: String, cores: Int, name: String, memory: String, net0: String, cpu: String): Result<HttpResponse> {
     val client: HttpClient = createKtorClient()
 
     @Serializable
@@ -74,10 +74,11 @@ suspend fun createVm(vmid: Int, node: String, cores: Int, name: String, memory: 
         val cores: Int,
         val name: String,
         val memory: String,
-        val net0: String
+        val net0: String,
+        val cpu: String
     )
 
-    val createVmData = createVmParams(vmid, node, cores, name, memory, net0)
+    val createVmData = createVmParams(vmid, node, cores, name, memory, net0, cpu)
 
     try {
         val response: HttpResponse = client.post("${proxmoxApi}/nodes/${node}/qemu") {

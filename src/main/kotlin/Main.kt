@@ -51,6 +51,7 @@ fun main() = runBlocking {
     val localLvmPath = "local-lvm"
     val cdrom = "${localPath}:cloudinit"
     val ciuser = "eren"
+    var cpu = "kvm64" // Default cpu type
 
 
     val printImageMap = mapOf(
@@ -99,6 +100,10 @@ fun main() = runBlocking {
     print("Enter the corresponding number : ")
     val imageInput: Int = readln().toInt()
     // println("Entered value is $imageInput")
+
+    if (imageInput == 4 || imageInput == 5 ) {
+        cpu = "host"
+    }
 
     println("The versions are : ")
 
@@ -167,7 +172,8 @@ fun main() = runBlocking {
             cores,
             name,
             memory,
-            net0 = "virtio,bridge=vmbr0")
+            net0 = "virtio,bridge=vmbr0",
+            cpu)
         result.fold(
             onSuccess = { response ->
                 println("Success : ${response.status}")
@@ -259,12 +265,12 @@ fun main() = runBlocking {
 
     // Invoke all the methods that are created
     createVmFunc()
-    Thread.sleep(2000)
+    Thread.sleep(5000)
     attachDiskFunc()
-    Thread.sleep(2000)
+    Thread.sleep(30000)
     resizeDiskFunc()
-    Thread.sleep(3000)
+    Thread.sleep(5000)
     cloudInitFunc()
-    Thread.sleep(2000)
+    Thread.sleep(5000)
     consoleAndBootOrderFunc()
 }
