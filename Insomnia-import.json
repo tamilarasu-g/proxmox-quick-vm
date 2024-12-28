@@ -1,0 +1,657 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2024-12-28T08:02:34.364Z",
+    "__export_source": "insomnia.desktop.app:v10.3.0",
+    "resources": [
+        {
+            "_id": "req_58bf817e7c9a485da196570230726ca3",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735222290584,
+            "created": 1734965469487,
+            "url": "{{ _.api_host }}/nodes/pve/qemu",
+            "name": "1. Create vm",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"vmid\": 120,\n\t\"memory\": \"2048\",\n\t\"cores\": 2,\n\t\"name\": \"test-vm\",\n\t\"net0\": \"virtio,bridge=vmbr0\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652231,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_4836b023e17148888a21b56ad7f3695a",
+            "parentId": "wrk_scratchpad",
+            "modified": 1734965221744,
+            "created": 1734964864913,
+            "name": "Proxmox",
+            "description": "",
+            "environment": {
+                "api_host": "https://<insert-domain-here>:8006/api2/json"
+            },
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1734964864913,
+            "headers": [
+                {
+                    "id": "pair_23965e162a224bfeb33bc17c9361c4dc",
+                    "name": "Authorization",
+                    "value": "PVEAPIToken=<insert-token-here>",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_5c2a9669c260454fad9a10387d08c165",
+                    "name": "",
+                    "value": "",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "environmentType": "kv",
+            "kvPairData": [
+                {
+                    "id": "envPair_cb988dd073b44714be16e9969c42e013",
+                    "name": "api_host",
+                    "value": "https://<insert-domain-here>:8006/api2/json",
+                    "type": "str",
+                    "enabled": true
+                }
+            ],
+            "_type": "request_group"
+        },
+        {
+            "_id": "wrk_scratchpad",
+            "parentId": null,
+            "modified": 1734963751147,
+            "created": 1734963751147,
+            "name": "Scratch Pad",
+            "description": "",
+            "scope": "collection",
+            "_type": "workspace"
+        },
+        {
+            "_id": "req_454a927430964dc59893dbf0939e4409",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735290006085,
+            "created": 1734965342138,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "name": "2. Attach disk",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"scsihw\": \"virtio-scsi-pci\",\n\t\"scsi0\": \"local-lvm:0,import-from=local:import/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652181,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_151a1f67784c481b81049a31b7f92434",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735211584342,
+            "created": 1734988821089,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/resize",
+            "name": "3. Resize the disk",
+            "description": "",
+            "method": "PUT",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"disk\": \"scsi0\",\n\t\"size\": \"10G\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652156,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_fa56c707606c4a9f9ec15a4fb8131a5f",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735219277687,
+            "created": 1734973364003,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "name": "4. Attach cloudinit drive",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"cdrom\": \"local:cloudinit\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652143.5,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_332c053331804e82a738b9075c774d95",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735290177073,
+            "created": 1734975379671,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "name": "5. Add cloudinit data",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"ciupgrade\": false,\n\t\"ciuser\": \"eren\",\n\t\"sshkeys\": \"ssh-ed25519%20AAAAC3NzaC1lZDI1NTE5AAAAIJFSCgxWu3m0FNyTnETY%2FyVZZn7OZddUGY1Yk2JNHHnJ%20tamila%40warhammer\",\n\t\"ipconfig0\": \"ip=10.2.0.17/24,gw=10.2.0.1\",\n\t\"nameserver\": \"8.8.8.8\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652137.25,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_26f7921c00904082bb578f0ebaa98864",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735036408007,
+            "created": 1734973949186,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "name": "6. add serial console",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"serial0\": \"socket\",\n\t\"vga\": \"serial0\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652135.6875,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_42e1f3434a6f4bd8adf4cd86803af803",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735036399976,
+            "created": 1734973885403,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "name": "7. set boot order",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"boot\": \"order=scsi0\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652134.125,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_5977c218bd604dbca05a389d6ac4d4cf",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735036466584,
+            "created": 1734976652131,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/120/status/start",
+            "name": "8. start vm",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976652131,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_b4cc18b34c1e4a65aa28c7be175c9ebf",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735025691082,
+            "created": 1735025686552,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/110/status/stop",
+            "name": "stop vm",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734976015901,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_fbdc3638e4c346c1ae071ed9321953ea",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735027466899,
+            "created": 1734966878026,
+            "url": "{{ _.api_host }}/nodes/pve/tasks",
+            "name": "get all tasks",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734966878026,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_a41ddebebb51463890d54975f6da263c",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1734987742284,
+            "created": 1734987726483,
+            "url": "{{ _.api_host }}/nodes/pve/tasks/UPID:pve:0001CA2A:003A11EC:6769CED5:download:debian.ova:root@pam!kotlin:/status",
+            "name": "get task details",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734966211601,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_afdd8a509c644e0dbac510178153be57",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1734987474878,
+            "created": 1734965545176,
+            "url": "{{ _.api_host }}/nodes/pve/storage/local/download-url",
+            "name": "download img",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"content\": \"import\",\n\t\"filename\": \"debian.ova\",\n\t\"url\": \"https://cdimage.debian.org/images/cloud/bookworm/20241201-1948/debian-12-generic-amd64-20241201-1948.qcow2\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734965545176,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_cc21b812d8de4dae93a6c29daed36ec9",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735239183476,
+            "created": 1735022427739,
+            "url": "{{ _.api_host }}/nodes/pve/qemu/150",
+            "name": "Delete the vm",
+            "description": "",
+            "method": "DELETE",
+            "body": {
+                "mimeType": "application/json",
+                "text": ""
+            },
+            "parameters": [
+                {
+                    "id": "pair_47aeeb15fb7846858b6f3e7b48126868",
+                    "name": "destroy-unreferenced-disks",
+                    "value": "true",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_294c0eb6dd384b81b38ede511c3c337d",
+                    "name": "purge",
+                    "value": "true",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734965405812.5,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_9f1ecd8c63044c709e9c5e06e7138ab8",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1734965335366,
+            "created": 1734965251759,
+            "url": "{{ _.api_host }}/nodes/pve/qemu",
+            "name": "Get all vm",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734965251759,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_63de2c9a8c4e400e839425159f517f5d",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735117613907,
+            "created": 1735117602105,
+            "url": "{{ _.api_host }}/nodes",
+            "name": "Get all nodes",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734965251709,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_cf0787d7743749509f99346c2c1bb1f3",
+            "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
+            "modified": 1735199826063,
+            "created": 1735199141166,
+            "url": "{{ _.api_host }}/nodes/pve/storage/local/content",
+            "name": "get qcow2 details",
+            "description": "",
+            "method": "GET",
+            "body": {
+                "mimeType": "application/json",
+                "text": ""
+            },
+            "parameters": [
+                {
+                    "id": "pair_600b63a4e6ae4513ad0bc49e9e80e02a",
+                    "name": "content",
+                    "value": "import",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnia/10.3.0"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1734965251659,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "env_99d30891da4bdcebc63947a8fc17f076de878684",
+            "parentId": "wrk_scratchpad",
+            "modified": 1734965217074,
+            "created": 1734963765366,
+            "name": "Base Environment",
+            "data": {
+                "api_host": "https://<insert-domain-here>:8006/api2/json",
+                "Authorization": "PVEAPIToken=<insert-token-here>"
+            },
+            "dataPropertyOrder": null,
+            "color": null,
+            "isPrivate": false,
+            "metaSortKey": 1734963765366,
+            "environmentType": "kv",
+            "kvPairData": [
+                {
+                    "id": "envPair_e9061767e9a0414aa04641d8c9454e72",
+                    "name": "api_host",
+                    "value": "https://<insert-domain-here>:8006/api2/json",
+                    "type": "str",
+                    "enabled": true
+                },
+                {
+                    "id": "envPair_b7831e0d51854229b2c3fffcb3513687",
+                    "name": "Authorization",
+                    "value": "PVEAPIToken=<insert-token-here>",
+                    "type": "str",
+                    "enabled": true
+                }
+            ],
+            "_type": "environment"
+        },
+        {
+            "_id": "jar_99d30891da4bdcebc63947a8fc17f076de878684",
+            "parentId": "wrk_scratchpad",
+            "modified": 1734963765583,
+            "created": 1734963765583,
+            "name": "Default Jar",
+            "cookies": [],
+            "_type": "cookie_jar"
+        }
+    ]
+}
