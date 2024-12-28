@@ -105,12 +105,12 @@ fun main() = runBlocking {
         cpu = "host"
     }
 
-    println("The versions are : ")
+    println()
+    println("Choose the version : ")
 
     val selectedImage: List<imageVersion>  = imageMap[imageInput]!!
     // println(selectedImage)
 
-    println("Choose the version : ")
     selectedImage.forEach{ image ->
         print("${image.id} : ${image.version}")
         println()
@@ -123,7 +123,7 @@ fun main() = runBlocking {
     val selectedImageVersion: String = selectedImage[selectedImageInput].file
 
     // println("Selected version is $selectedImageVersion")
-
+    println()
     println("Choose the size of the vm")
     print("0 -> ")
     size1.forEach{ size ->
@@ -263,14 +263,32 @@ fun main() = runBlocking {
         )
     }
 
+    suspend fun startVmFunc() {
+        val result = startVm(
+            vmid,
+            node
+        )
+        result.fold(
+            onSuccess = { response ->
+                println("Success : ${response.status}")
+                println("Data is ${response.bodyAsText()}")
+            },
+            onFailure = { exception ->
+                println("Error : ${exception.message}")
+            }
+        )
+    }
+
     // Invoke all the methods that are created
     createVmFunc()
     Thread.sleep(5000)
     attachDiskFunc()
-    Thread.sleep(30000)
+    Thread.sleep(5000)
     resizeDiskFunc()
     Thread.sleep(5000)
     cloudInitFunc()
     Thread.sleep(5000)
     consoleAndBootOrderFunc()
+    Thread.sleep(3000)
+    startVmFunc()
 }

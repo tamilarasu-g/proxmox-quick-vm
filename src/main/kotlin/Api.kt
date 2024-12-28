@@ -206,6 +206,20 @@ suspend fun addSerialConsoleAndSetBootOrder(serial0: String, vga: String, boot:S
     } finally {
         client.close()
     }
+}
 
+suspend fun startVm(vmid: Int, node: String): Result<HttpResponse> {
+    val client: HttpClient = createKtorClient()
+
+    try {
+        val response: HttpResponse = client.post("${proxmoxApi}/nodes/${node}/qemu/${vmid}/status/start") {
+            header("Authorization", authHeader)
+        }
+        return Result.success(response)
+    } catch (e: Exception) {
+        return Result.failure(e)
+    } finally {
+        client.close()
+    }
 
 }
