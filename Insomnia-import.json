@@ -1,15 +1,15 @@
 {
     "_type": "export",
     "__export_format": 4,
-    "__export_date": "2024-12-28T08:02:34.364Z",
+    "__export_date": "2025-01-17T08:47:37.691Z",
     "__export_source": "insomnia.desktop.app:v10.3.0",
     "resources": [
         {
             "_id": "req_58bf817e7c9a485da196570230726ca3",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735222290584,
+            "modified": 1737103000552,
             "created": 1734965469487,
-            "url": "{{ _.api_host }}/nodes/pve/qemu",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu",
             "name": "1. Create vm",
             "description": "",
             "method": "POST",
@@ -43,12 +43,13 @@
         {
             "_id": "fld_4836b023e17148888a21b56ad7f3695a",
             "parentId": "wrk_scratchpad",
-            "modified": 1734965221744,
+            "modified": 1737103643096,
             "created": 1734964864913,
             "name": "Proxmox",
             "description": "",
             "environment": {
-                "api_host": "https://<insert-domain-here>:8006/api2/json"
+                "api_host": "https://<insert-domain-here>:8006/api2/json",
+                "node": "pve"
             },
             "environmentPropertyOrder": null,
             "metaSortKey": -1734964864913,
@@ -76,6 +77,13 @@
                     "value": "https://<insert-domain-here>:8006/api2/json",
                     "type": "str",
                     "enabled": true
+                },
+                {
+                    "id": "envPair_1e1681a5328e4d7792a05e616f209cbe",
+                    "name": "node",
+                    "value": "pve",
+                    "type": "str",
+                    "enabled": true
                 }
             ],
             "_type": "request_group"
@@ -93,15 +101,15 @@
         {
             "_id": "req_454a927430964dc59893dbf0939e4409",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735290006085,
+            "modified": 1737103011824,
             "created": 1734965342138,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/config",
             "name": "2. Attach disk",
             "description": "",
             "method": "POST",
             "body": {
                 "mimeType": "application/json",
-                "text": "{\n\t\"scsihw\": \"virtio-scsi-pci\",\n\t\"scsi0\": \"local-lvm:0,import-from=local:import/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2\"\n}"
+                "text": "{\n\t\"scsihw\": \"virtio-scsi-pci\",\n\t\"scsi0\": \"local-lvm:0,import-from=local:import/kali-linux-2024.4-qemu-amd64.qcow2\"\n}"
             },
             "parameters": [],
             "headers": [
@@ -129,9 +137,9 @@
         {
             "_id": "req_151a1f67784c481b81049a31b7f92434",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735211584342,
+            "modified": 1737103021451,
             "created": 1734988821089,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/resize",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/resize",
             "name": "3. Resize the disk",
             "description": "",
             "method": "PUT",
@@ -165,9 +173,9 @@
         {
             "_id": "req_fa56c707606c4a9f9ec15a4fb8131a5f",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735219277687,
+            "modified": 1737103033019,
             "created": 1734973364003,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/config",
             "name": "4. Attach cloudinit drive",
             "description": "",
             "method": "POST",
@@ -201,9 +209,9 @@
         {
             "_id": "req_332c053331804e82a738b9075c774d95",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735290177073,
+            "modified": 1737103050550,
             "created": 1734975379671,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/config",
             "name": "5. Add cloudinit data",
             "description": "",
             "method": "POST",
@@ -237,9 +245,9 @@
         {
             "_id": "req_26f7921c00904082bb578f0ebaa98864",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735036408007,
+            "modified": 1737103065472,
             "created": 1734973949186,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/config",
             "name": "6. add serial console",
             "description": "",
             "method": "POST",
@@ -273,9 +281,9 @@
         {
             "_id": "req_42e1f3434a6f4bd8adf4cd86803af803",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735036399976,
+            "modified": 1737103075103,
             "created": 1734973885403,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/config",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/config",
             "name": "7. set boot order",
             "description": "",
             "method": "POST",
@@ -309,9 +317,9 @@
         {
             "_id": "req_5977c218bd604dbca05a389d6ac4d4cf",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735036466584,
+            "modified": 1737103088656,
             "created": 1734976652131,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/120/status/start",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/120/status/start",
             "name": "8. start vm",
             "description": "",
             "method": "POST",
@@ -338,9 +346,9 @@
         {
             "_id": "req_b4cc18b34c1e4a65aa28c7be175c9ebf",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735025691082,
+            "modified": 1737103099900,
             "created": 1735025686552,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/110/status/stop",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/110/status/stop",
             "name": "stop vm",
             "description": "",
             "method": "POST",
@@ -367,9 +375,9 @@
         {
             "_id": "req_fbdc3638e4c346c1ae071ed9321953ea",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735027466899,
+            "modified": 1737103109771,
             "created": 1734966878026,
-            "url": "{{ _.api_host }}/nodes/pve/tasks",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/tasks",
             "name": "get all tasks",
             "description": "",
             "method": "GET",
@@ -396,9 +404,9 @@
         {
             "_id": "req_a41ddebebb51463890d54975f6da263c",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1734987742284,
+            "modified": 1737103126519,
             "created": 1734987726483,
-            "url": "{{ _.api_host }}/nodes/pve/tasks/UPID:pve:0001CA2A:003A11EC:6769CED5:download:debian.ova:root@pam!kotlin:/status",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/tasks/UPID:pve:0001CA2A:003A11EC:6769CED5:download:debian.ova:root@pam!kotlin:/status",
             "name": "get task details",
             "description": "",
             "method": "GET",
@@ -425,9 +433,9 @@
         {
             "_id": "req_afdd8a509c644e0dbac510178153be57",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1734987474878,
+            "modified": 1737103142241,
             "created": 1734965545176,
-            "url": "{{ _.api_host }}/nodes/pve/storage/local/download-url",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/storage/local/download-url",
             "name": "download img",
             "description": "",
             "method": "POST",
@@ -461,9 +469,9 @@
         {
             "_id": "req_cc21b812d8de4dae93a6c29daed36ec9",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735239183476,
+            "modified": 1737103155220,
             "created": 1735022427739,
-            "url": "{{ _.api_host }}/nodes/pve/qemu/150",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/qemu/150",
             "name": "Delete the vm",
             "description": "",
             "method": "DELETE",
@@ -512,9 +520,9 @@
         {
             "_id": "req_9f1ecd8c63044c709e9c5e06e7138ab8",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1734965335366,
+            "modified": 1737102956630,
             "created": 1734965251759,
-            "url": "{{ _.api_host }}/nodes/pve/qemu",
+            "url": "{{ _.api_host }}/nodes/{{node}}/qemu",
             "name": "Get all vm",
             "description": "",
             "method": "GET",
@@ -570,9 +578,9 @@
         {
             "_id": "req_cf0787d7743749509f99346c2c1bb1f3",
             "parentId": "fld_4836b023e17148888a21b56ad7f3695a",
-            "modified": 1735199826063,
+            "modified": 1737103170487,
             "created": 1735199141166,
-            "url": "{{ _.api_host }}/nodes/pve/storage/local/content",
+            "url": "{{ _.api_host }}/nodes/{{ _.node }}/storage/local/content",
             "name": "get qcow2 details",
             "description": "",
             "method": "GET",
