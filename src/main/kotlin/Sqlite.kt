@@ -29,6 +29,7 @@ object Username: Table("username") {
 
 object Sshkeys: Table("ssh_keys") {
     val key_id = integer("key_id").autoIncrement()
+    val name = varchar("name", 255)
     val ssh_key = text("ssh_key")
     val ssh_key_url_encoded = text("ssh_key_url_encoded")
     override val primaryKey = PrimaryKey(key_id)
@@ -44,7 +45,8 @@ object VMSize: Table("vm_size") {
 
 fun createTables() {
     transaction {
-        SchemaUtils.create(Distros, DistroVersions, Username, Sshkeys, VMSize)
+//        SchemaUtils.create(Distros, DistroVersions, Username, Sshkeys, VMSize)
+        SchemaUtils.create(Sshkeys)
     }
 }
 
@@ -176,6 +178,7 @@ fun main() {
 
 //    val public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJFSCgxWu3m0FNyTnETY/yVZZn7OZddUGY1Yk2JNHHnJ tamila@warhammer"
 //    val ssh_key_url_encoded = URLEncoder.encode(public_key, StandardCharsets.UTF_8.toString()).replace("+", "%20")
+//    val name = "Test"
 //    println(ssh_key_url_encoded)
 //
 //    transaction {
@@ -185,6 +188,7 @@ fun main() {
 //        Sshkeys.batchInsert(keys) { (key, encoded_key) ->
 //            this[Sshkeys.ssh_key] = key
 //            this[Sshkeys.ssh_key_url_encoded] = encoded_key
+//            this[Sshkeys.name] = name
 //        }
 //    }
 

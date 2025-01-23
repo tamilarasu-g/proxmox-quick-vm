@@ -103,8 +103,45 @@ fun main() = runBlocking {
 
     println()
 
-    print("Enter the SSH Key : ")
-    val sshKey: String = URLEncoder.encode(readln(), StandardCharsets.UTF_8.toString()).replace("+", "%20")
+    println("Choose the SSH Key : ")
+
+    transaction {
+        val ssh_keys = Sshkeys.selectAll().map {
+            it[Sshkeys.key_id] to it[Sshkeys.name]
+        }
+        ssh_keys.forEach { (id, name) ->
+            println("$id : $name")
+        }
+    }
+
+    print("Enter the corresponding number or Enter 0 to use paste the SSH Key : ")
+
+    var sshKey: String = ""
+    val inputSSHKey = readln().toInt()
+    if (inputSSHKey == 0) {
+        print("Enter the SSH Key : ")
+        val ssh_key = readln()
+        val ssh_key_url_encoded = URLEncoder.encode(ssh_key, StandardCharsets.UTF_8.toString()).replace("+", "%20")
+        sshKey = ssh_key_url_encoded
+        println()
+        print("Enter the name for the SSH Key : ")
+        val name = readln()
+        transaction {
+            val keys = listOf(
+                ssh_key to ssh_key_url_encoded
+            )
+            Sshkeys.batchInsert(keys) { (key, encoded_key) ->
+                this[Sshkeys.ssh_key] = key
+                this[Sshkeys.ssh_key_url_encoded] = encoded_key
+                this[Sshkeys.name] = name
+            }
+        }
+    }
+    else {
+        transaction {
+            sshKey = Sshkeys.slice(Sshkeys.ssh_key_url_encoded).select(Sshkeys.key_id eq inputSSHKey).single().get(Sshkeys.ssh_key_url_encoded)
+        }
+    }
 
     println()
 
